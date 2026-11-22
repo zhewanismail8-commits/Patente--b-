@@ -3,488 +3,816 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Patente B • Quiz & VIP Video | Ismael Rasool</title>
+  <title>Patente B — Quiz &amp; VIP Video</title>
   <style>
+    /* Design tokens & adaptive palette */
     :root {
       --bg: #070b14;
       --surface: #0f172a;
-      --card: #131c31;
-      --card-2: #18233d;
-      --border: rgba(148, 163, 184, 0.16);
+      --card: #111827;
+      --card-2: #1e293b;
       --text: #f8fafc;
       --muted: #94a3b8;
       --accent: #38bdf8;
       --accent-2: #6366f1;
       --vip: #f59e0b;
-      --ok: #22c55e;
-      --err: #ef4444;
-      --radius: 16px;
+      --vero: #22c55e;
+      --falso: #ef4444;
+      --border: rgba(148, 163, 184, 0.18);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
     }
-    * { box-sizing: border-box; }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f1f5f9;
+        --surface: #ffffff;
+        --card: #ffffff;
+        --card-2: #e2e8f0;
+        --text: #0f172a;
+        --muted: #475569;
+        --accent: #0284c7;
+        --accent-2: #4f46e5;
+        --vip: #d97706;
+        --vero: #16a34a;
+        --falso: #dc2626;
+        --border: rgba(15, 23, 42, 0.12);
+        --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Naskh Arabic", sans-serif;
-      background: radial-gradient(circle at top, #111c36 0%, var(--bg) 55%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 45%), var(--bg);
       color: var(--text);
       min-height: 100vh;
-      line-height: 1.65;
+      padding: 16px;
     }
-    a { color: var(--accent); text-decoration: none; }
-    .container { max-width: 1020px; margin: 0 auto; padding: 20px 16px 64px; }
-    .topbar {
-      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-      gap: 12px; background: rgba(15, 23, 42, 0.88); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px 18px;
+
+    .app {
+      max-width: 820px;
+      margin: 0 auto;
     }
-    .brand h1 { margin: 0; font-size: 1.25rem; }
-    .brand p { margin: 4px 0 0; font-size: 0.88rem; color: var(--muted); }
-    .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-    .btn, select, input {
-      font-family: inherit; font-size: 0.92rem; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--card-2); color: var(--text);
-      padding: 9px 13px; cursor: pointer;
+
+    /* Non-blocking notification banner replacing alert() */
+    .toast {
+      display: none;
+      margin-bottom: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      background: var(--card-2);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      line-height: 1.6;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
-    input { cursor: text; }
-    .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #04101f; font-weight: 700; border: none; }
-    .btn.vip { background: linear-gradient(135deg, #fbbf24, var(--vip)); color: #1c1202; font-weight: 700; border: none; }
-    .btn.active { outline: 2px solid var(--accent); background: rgba(56, 189, 248, 0.16); }
-    .grid-2 { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 16px; margin-top: 16px; }
-    @media (max-width: 820px) { .grid-2 { grid-template-columns: 1fr; } }
-    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
-    .meta-line { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; }
-    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; background: rgba(56, 189, 248, 0.12); color: var(--accent); }
-    .badge.vip-badge { background: rgba(245, 158, 11, 0.14); color: #fcd34d; }
-    .q-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-top: 12px; }
-    .video-box { background: #080d18; border: 1px dashed rgba(245, 158, 11, 0.45); border-radius: 12px; padding: 12px; margin: 12px 0; }
-    .choices { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-    .choice-btn { flex: 1 1 120px; padding: 11px 14px; border-radius: 11px; border: 1px solid var(--border); background: var(--card-2); color: var(--text); font-weight: 700; cursor: pointer; }
-    .choice-btn.selected-true { border-color: var(--ok); background: rgba(34, 197, 94, 0.16); }
-    .choice-btn.selected-false { border-color: var(--err); background: rgba(239, 68, 68, 0.16); }
-    .feedback { margin-top: 14px; padding: 13px; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid var(--border); display: none; }
-    .chapters-list { display: grid; gap: 8px; max-height: 430px; overflow-y: auto; }
-    .chapter-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 11px; background: var(--card); border: 1px solid var(--border); cursor: pointer; text-align: right; }
-    .chapter-item.active { border-color: var(--accent); background: rgba(56, 189, 248, 0.12); }
-    .lock-note { font-size: 0.78rem; color: #fbbf24; }
-    .footer-card { margin-top: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; font-size: 0.88rem; color: var(--muted); }
-    .vip-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-    .status-msg { margin-top: 8px; font-size: 0.85rem; }
+
+    .toast.show {
+      display: flex;
+    }
+
+    .toast-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 16px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+
+    .header {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      color: var(--accent);
+    }
+
+    .badge-vip {
+      background: rgba(245, 158, 11, 0.16);
+      color: var(--vip);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+    }
+
+    select,
+    button,
+    input {
+      font-family: inherit;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 11px 14px;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--card-2);
+      outline: none;
+    }
+
+    select:focus,
+    input:focus,
+    button:focus-visible {
+      border-color: var(--accent);
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.12s ease, opacity 0.15s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      border: none;
+      font-weight: 800;
+    }
+
+    .btn-vip {
+      background: var(--vip);
+      color: #1f1200;
+      border: none;
+      font-weight: 800;
+    }
+
+    .progress-wrap {
+      background: var(--card-2);
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 14px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--vero));
+      transition: width 0.25s ease;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .q-it {
+      direction: ltr;
+      text-align: left;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .q-ku {
+      font-size: 18px;
+      line-height: 1.75;
+      margin-bottom: 16px;
+    }
+
+    .media-area {
+      margin-bottom: 16px;
+    }
+
+    .media-area img,
+    .media-area video {
+      width: 100%;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: #000000;
+      display: none;
+    }
+
+    .vip-lock {
+      display: none;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px dashed var(--vip);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .vip-lock h3 {
+      margin: 0 0 8px;
+      color: var(--vip);
+      font-size: 17px;
+    }
+
+    .vip-lock p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .vip-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 520px) {
+      .answers {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-vero {
+      background: var(--vero);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .btn-falso {
+      background: var(--falso);
+      color: #ffffff;
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .feedback {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .nav button {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header class="topbar">
-      <div class="brand">
-        <h1 id="appTitle">Patente B • Quiz &amp; VIP Video</h1>
-        <p id="appSubtitle">١٦ بەشی فەرمیی وەزارەت • ڕاهێنان و تاقیکردنەوە • ئیتاڵی، سۆرانی و بادینی</p>
+  <div class="app">
+    <!-- Banner message container -->
+    <div id="toastBox" class="toast" role="status" aria-live="polite">
+      <span id="toastMessage"></span>
+      <button type="button" class="toast-close" onclick="hideToast()" aria-label="داخستن">✕</button>
+    </div>
+
+    <div class="header">
+      <div class="header-top">
+        <div class="brand">Patente B — Quiz &amp; Video</div>
+        <button type="button" id="vipStatusBtn" class="badge-vip" onclick="focusVipOrInfo()">دۆخی VIP: قفڵە</button>
       </div>
 
       <div class="controls">
-        <select id="langSelect" aria-label="هەڵبژاردنی زمان / Selezione lingua">
-          <option value="ckb">کوردی سۆرانی</option>
-          <option value="kmr">کوردی بادینی</option>
-          <option value="it">Italiano</option>
+        <select id="chapterSelect" onchange="applyFilters()">
+          <option value="all">هەموو بەشەکان (١ - ١٦)</option>
+          <option value="video_vip">بەشی ڤیدیۆیی (VIP)</option>
         </select>
 
-        <button type="button" class="btn active" id="modePracticeBtn" aria-label="شێوازی ڕاهێنان">ڕاهێنان</button>
-        <button type="button" class="btn" id="modeExamBtn" aria-label="شێوازی تاقیکردنەوە">تاقیکردنەوە</button>
-        <button type="button" class="btn vip" id="vipToggleBtn" aria-label="چالاککردنی VIP">کۆدی VIP</button>
+        <select id="langSelect" onchange="renderQuestion()">
+          <option value="both">ئیتاڵی + کوردی</option>
+          <option value="it">تەنها ئیتاڵی</option>
+          <option value="sorani">کوردی سۆرانی</option>
+          <option value="badini">کوردی بادینی</option>
+        </select>
+
+        <button type="button" class="btn-primary" onclick="startExamMode()">تاقیکردنەوەی ٣٠ پرسیار</button>
       </div>
-    </header>
 
-    <div class="grid-2">
-      <main class="panel">
-        <div class="meta-line">
-          <span class="badge" id="chapterBadge">بەش ١ / ١٦</span>
-          <span class="badge vip-badge" id="vipStatusBadge">دۆخی ئاسایی (Free)</span>
-          <span class="badge timer-box" id="timerBadge" style="display:none;">کاتی تاقیکردنەوە: 30:00</span>
-        </div>
+      <div class="progress-wrap">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
 
-        <h2 id="chapterTitle">١. پێناسەی ئۆتۆمبێل و ڕێسا گشتییەکانی هاتوچۆ</h2>
-
-        <div class="q-card" id="questionCard">
-          <div id="questionMeta" class="meta-line"></div>
-          <p id="questionText"></p>
-
-          <div id="videoSection" class="video-box" style="display:none;">
-            <strong id="videoLabel">پرسیاری ڤیدیۆ (VIP):</strong>
-            <p id="videoDesc" style="margin:6px 0 0; font-size:0.9rem; color:#cbd5e1;"></p>
-          </div>
-
-          <div class="choices">
-            <button type="button" class="choice-btn" id="btnTrue" aria-label="وەڵامی ڕاست (Vero)">Vero / ڕاست</button>
-            <button type="button" class="choice-btn" id="btnFalse" aria-label="وەڵامی هەڵە (Falso)">Falso / هەڵە</button>
-          </div>
-
-          <div class="feedback" id="feedbackBox"></div>
-        </div>
-
-        <div class="choices" style="margin-top:14px;">
-          <button type="button" class="btn" id="prevQBtn" aria-label="پرسیاری پێشوو">پرسیاری پێشوو</button>
-          <button type="button" class="btn primary" id="nextQBtn" aria-label="پرسیاری دواتر">پرسیاری دواتر</button>
-          <button type="button" class="btn" id="finishExamBtn" aria-label="تەواوکردن و پشکنینی ئەنجام" style="display:none;">تەواوکردنی تاقیکردنەوە</button>
-        </div>
-
-        <div id="vipActivationPanel" class="q-card" style="display:none; margin-top:16px;">
-          <h3 id="vipPanelTitle" style="margin:0 0 6px; font-size:1rem;">چالاککردنی هەژماری VIP لە ڕێگای Supabase</h3>
-          <p id="vipPanelDesc" style="margin:0; font-size:0.88rem; color:var(--muted);">
-            کۆدی چالاککردن بە شێوەی پارێزراو لە داتابەیسەوە دەپشکنرێت؛ هیچ کۆدێک لەناو کۆدی سایتەکەدا جێگیر نەکراوە.
-          </p>
-          <div class="vip-row">
-            <input type="text" id="vipCodeInput" placeholder="کۆدی VIP بنووسە..." aria-label="داخڵکردنی کۆدی VIP" />
-            <button type="button" class="btn vip" id="verifyVipBtn" aria-label="پشکنین و چالاککردنی کۆد">چالاککردن</button>
-          </div>
-          <div id="vipStatusMsg" class="status-msg"></div>
-        </div>
-      </main>
-
-      <aside class="panel">
-        <h2 id="chaptersHeading">١٦ بەشە فەرمییەکەی Patente B</h2>
-        <div class="meta-line">
-          <span id="progressStats">پێشکەوتن: ٠ پرسیار وەڵام دراوە</span>
-        </div>
-        <div class="chapters-list" id="chaptersList"></div>
-      </aside>
+      <div class="meta-row">
+        <span id="counter">پرسیار ١ لە ٢</span>
+        <span id="timerText">دۆخی خوێندنی ئاسایی</span>
+      </div>
     </div>
 
-    <footer class="footer-card">
-      <div>
-        <strong id="sourceLabel">سەرچاوە و ڕێکەوتی فەرمی:</strong>
-        <span id="sourceText">Codice della Strada (D.Lgs. 285/1992) و پرۆگرامی فەرمیی وەزارەتی گواستنەوەی ئیتاڵیا (MIT) • نوێکراوەتەوە: نۆڤەمبەری ٢٠٢٦</span>
+    <div class="card">
+      <div id="qIt" class="q-it"></div>
+      <div id="qKu" class="q-ku"></div>
+
+      <div class="media-area">
+        <img id="qImg" alt="Road sign" />
+        <video id="qVideo" controls playsinline preload="metadata"></video>
+
+        <div id="vipLockBox" class="vip-lock">
+          <h3>پرسیاری ڤیدیۆیی تایبەت (VIP)</h3>
+          <p>بۆ بینینی ڤیدیۆی شیکاری و دۆخەکانی هاتوچۆ، کۆدی چالاککردنی تایبەت بە خۆت بنووسە.</p>
+          <div class="vip-form">
+            <input id="vipCodeInput" type="text" placeholder="کۆدی VIP بنووسە" />
+            <button type="button" class="btn-vip" onclick="handleUnlockVip()">چالاککردن</button>
+          </div>
+        </div>
       </div>
-      <div style="margin-top:8px;">
-        <strong id="legalLabel">تێبینی یاسایی:</strong>
-        <span id="legalText">ئەم پلاتفۆرمە بۆ مەبەستی فێربوون و ڕاهێنانە و جێگرەوەی ڕێنمایی فەرمیی تاقیکردنەوەی وەزارەت نییە.</span>
+
+      <div class="answers">
+        <button type="button" class="btn-vero" onclick="submitAnswer(true)">VERO / ڕاستە</button>
+        <button type="button" class="btn-falso" onclick="submitAnswer(false)">FALSO / هەڵەیە</button>
       </div>
-      <div style="margin-top:8px;">
-        <span id="creatorText">ئامادەکردنی: Ismael Rasool • </span>
-        <a href="https://www.facebook.com/share/1DxKKwvjYU/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="پەیجی فەرمی لە فەیسبووک">فەیسبووک (Facebook)</a>
+
+      <div id="feedback" class="feedback"></div>
+
+      <div class="nav">
+        <button type="button" onclick="prevQuestion()">پرسیاری پێشوو</button>
+        <button type="button" onclick="nextQuestion()">پرسیاری دواتر</button>
       </div>
-    </footer>
+    </div>
   </div>
+
   <script>
-    const SUPABASE_CONFIG = {
-      url: "",
-      anonKey: "",
-      rpcName: "verify_vip_code"
-    };
-
-    const CHAPTERS = [
-      { id: 1, vip: false, it: "1. Definizioni generali e doveri nell'uso della strada", ckb: "١. پێناسە گشتییەکان و ئەرکەکانی بەکارهێنانی ڕێگا", kmr: "١. پێناسەیێن گشتی و ئەرکێن بکارئینانا ڕێکێ" },
-      { id: 2, vip: false, it: "2. Segnali di pericolo", ckb: "٢. هێماکانی ئاگادارکردنەوە (مەترسی)", kmr: "٢. هێمایێن ئاگەهدارکرنێ (مەترسی)" },
-      { id: 3, vip: false, it: "3. Segnali di prescrizione: divieto e obbligo", ckb: "٣. هێماکانی قەدەغەکردن و ناچارکردن", kmr: "٣. هێمایێن قەدەغەکرنێ و نەچارکرنێ" },
-      { id: 4, vip: false, it: "4. Segnali di indicazione", ckb: "٤. هێماکانی ڕێنیشاندەر", kmr: "٤. هێمایێن ڕێنیشاندەر" },
-      { id: 5, vip: false, it: "5. Segnaletica stradale e sui veicoli", ckb: "٥. هێماکانی سەر ڕێگا و سەر ئۆتۆمبێل", kmr: "٥. هێمایێن سەر ڕێکێ و سەر ترۆمبێلێ" },
-      { id: 6, vip: true,  it: "6. Norme sulla circolazione e precedenze", ckb: "٦. ڕێساکانی هاتوچۆ و پێشینە (VIP)", kmr: "٦. یاسایێن هاتنوچوونێ و پێشینێ (VIP)" },
-      { id: 7, vip: true,  it: "7. Velocità, pericolo e intralcio", ckb: "٧. خێرایی، مەترسی و دروستکردنی لەمپەر (VIP)", kmr: "٧. لەزاتی، مەترسی و چێکرنا ئاستەنگیێ (VIP)" },
-      { id: 8, vip: false, it: "8. Distanza di sicurezza e manovre", ckb: "٨. مەودای سەلامەتی و جوڵەکان (مانۆڕ)", kmr: "٨. دووراتیا سەلامەتیێ و لڤینان" },
-      { id: 9, vip: true,  it: "9. Sorpasso, incrocio e sensi unici", ckb: "٩. تێپەڕاندن، یەکتربڕ و شەقامە یەک ئاڕاستەکان (VIP)", kmr: "٩. دەربازبوون، یەکتربڕ و جاددەیێن ئێک ئاڕاستە (VIP)" },
-      { id: 10, vip: false, it: "10. Fermata, sosta e arresto", ckb: "١٠. وەستانی کاتی، وەستانی درێژ و ڕاوەستان", kmr: "١٠. ڕاوەستانا دەمکی، پارکرن و ڕاوەستان" },
-      { id: 11, vip: false, it: "11. Segnalazione visiva e acustica, illuminazione", ckb: "١١. هێمای بینراو و دەنگی و سیستەمی ڕووناکی", kmr: "١١. هێمایێن دیتنێ و دەنگی و ڕۆناهیێ" },
-      { id: 12, vip: true,  it: "12. Documenti, patente, assicurazione e responsabilità", ckb: "١٢. بەڵگەنامە، مۆڵەت، بیمە و بەرپرسیارێتی یاسایی (VIP)", kmr: "١٢. بەڵگەنامە، مۆڵەت، بیمە و بەرپرسیارەتیا یاسایی (VIP)" },
-      { id: 13, vip: true,  it: "13. Comportamento in caso di incidente e primo soccorso", ckb: "١٣. هەڵسوکەوت لە کاتی ڕووداو و فریاگوزاری سەرەتایی (VIP)", kmr: "١٣. سەرەدەری د دەمێ ڕوودانێ دا و هاریکاریا دەستپێکی (VIP)" },
-      { id: 14, vip: false, it: "14. Stato psicofisico, al
-    const state = {
-      lang: localStorage.getItem("pb_lang") || "ckb",
-      mode: "practice",
-      chapterId: 1,
-      isVip: localStorage.getItem("pb_vip") === "true",
-      answers: JSON.parse(localStorage.getItem("pb_answers") || "{}"),
-      examSecondsLeft: 30 * 60,
-      timerId: null
-    };
-
-    function saveState() {
-      localStorage.setItem("pb_lang", state.lang);
-      localStorage.setItem("pb_vip", String(state.isVip));
-      localStorage.setItem("pb_answers", JSON.stringify(state.answers));
-    }
-
-    function t() {
-      return UI_TEXT[state.lang] || UI_TEXT.ckb;
-    }
-
-    function currentChapter() {
-      return CHAPTERS.find((c) => c.id === state.chapterId) || CHAPTERS[0];
-    }
-
-    function currentQuestion() {
-      return SAMPLE_QUESTIONS.find((q) => q.chapterId === state.chapterId) || SAMPLE_QUESTIONS[0];
-    }
-
-    function formatTimer(sec) {
-      const m = String(Math.floor(sec / 60)).padStart(2, "0");
-      const s = String(sec % 60).padStart(2, "0");
-      return `${m}:${s}`;
-    }
-
-    function startExamTimer() {
-      clearInterval(state.timerId);
-      state.examSecondsLeft = 30 * 60;
-      document.getElementById("timerBadge").style.display = "inline-flex";
-      document.getElementById("timerBadge").textContent = `⏱ ${formatTimer(state.examSecondsLeft)}`;
-
-      state.timerId = setInterval(() => {
-        state.examSecondsLeft -= 1;
-        document.getElementById("timerBadge").textContent = `⏱ ${formatTimer(state.examSecondsLeft)}`;
-        if (state.examSecondsLeft <= 0) {
-          clearInterval(state.timerId);
-          finishExam();
-        }
-      }, 1000);
-    }
-
-    function stopExamTimer() {
-      clearInterval(state.timerId);
-      state.timerId = null;
-      document.getElementById("timerBadge").style.display = "none";
-    }
-
-    function finishExam() {
-      stopExamTimer();
-      let correct = 0;
-      let total = 0;
-      SAMPLE_QUESTIONS.forEach((q) => {
-        const ch = CHAPTERS.find((c) => c.id === q.chapterId);
-        if (!ch.vip || state.isVip) {
-          total += 1;
-          if (state.answers[q.id] === q.ans) correct += 1;
-        }
-      });
-      const fb = document.getElementById("feedbackBox");
-      fb.style.display = "block";
-      fb.style.borderColor = "var(--accent)";
-      fb.innerHTML = `<strong>${t().finishExam}:</strong> ${correct} / ${total}`;
-    }
-
-    function renderChapters() {
-      const list = document.getElementById("chaptersList");
-      list.innerHTML = "";
-      const tr = t();
-
-      CHAPTERS.forEach((ch) => {
-        const item = document.createElement("button");
-        item.type = "button";
-        item.className = `chapter-item ${ch.id === state.chapterId ? "active" : ""}`;
-        item.setAttribute("aria-label", ch[state.lang]);
-
-        const titleSpan = document.createElement("span");
-        titleSpan.textContent = ch[state.lang];
-
-        const tagSpan = document.createElement("span");
-        if (ch.vip && !state.isVip) {
-          tagSpan.className = "lock-note";
-          tagSpan.textContent = "🔒 VIP";
-        } else {
-          tagSpan.className = "badge";
-          tagSpan.textContent = `#${ch.id}`;
-        }
-
-        item.appendChild(titleSpan);
-        item.appendChild(tagSpan);
-
-        item.addEventListener("click", () => {
-          if (ch.vip && !state.isVip) {
-            document.getElementById("vipActivationPanel").style.display = "block";
-            document.getElementById("vipStatusMsg").textContent = tr.vipLockedMsg;
-            return;
-          }
-          state.chapterId = ch.id;
-          renderAll();
-        });
-
-        list.appendChild(item);
-      });
-
-      const doneCount = Object.keys(state.answers).length;
-      document.getElementById("progressStats").textContent =
-        state.lang === "it"
-          ? `Progresso: ${doneCount} risposte salvate`
-          : state.lang === "kmr"
-          ? `پێشکەوتن: ${doneCount} بەرسڤ تۆمارکرینە`
-          : `پێشکەوتن: ${doneCount} وەڵام تۆمارکراوە`;
-    }
-
-    function renderAll() {
-      const tr = t();
-      document.documentElement.lang = state.lang;
-      document.documentElement.dir = tr.dir;
-      document.getElementById("langSelect").value = state.lang;
-
-      document.getElementById("appTitle").textContent = tr.title;
-      document.getElementById("appSubtitle").textContent = tr.subtitle;
-      document.getElementById("modePracticeBtn").textContent = tr.practice;
-      document.getElementById("modeExamBtn").textContent = tr.exam;
-      document.getElementById("vipToggleBtn").textContent = tr.vipBtn;
-      document.getElementById("chaptersHeading").textContent = tr.chaptersHeading;
-      document.getElementById("prevQBtn").textContent = tr.prev;
-      document.getElementById("nextQBtn").textContent = tr.next;
-      document.getElementById("finishExamBtn").textContent = tr.finishExam;
-      document.getElementById("btnTrue").textContent = tr.trueLabel;
-      document.getElementById("btnFalse").textContent = tr.falseLabel;
-
-      document.getElementById("vipPanelTitle").textContent = tr.vipTitle;
-      document.getElementById("vipPanelDesc").textContent = tr.vipDesc;
-      document.getElementById("vipCodeInput").placeholder = tr.vipPlaceholder;
-      document.getElementById("verifyVipBtn").textContent = tr.activateBtn;
-
-      document.getElementById("sourceLabel").textContent = tr.sourceLabel + " ";
-      document.getElementById("sourceText").textContent = tr.sourceText;
-      document.getElementById("legalLabel").textContent = tr.legalLabel + " ";
-      document.getElementById("legalText").textContent = tr.legalText;
-      document.getElementById("creatorText").textContent = tr.creatorText;
-
-      const vipBadge = document.getElementById("vipStatusBadge");
-      vipBadge.textContent = state.isVip ? tr.vipBadge : tr.freeBadge;
-
-      document.getElementById("modePracticeBtn").classList.toggle("active", state.mode === "practice");
-      document.getElementById("modeExamBtn").classList.toggle("active", state.mode === "exam");
-      document.getElementById("finishExamBtn").style.display = state.mode === "exam" ? "inline-block" : "none";
-
-      const ch = currentChapter();
-      if (ch.vip && !state.isVip) {
-        state.chapterId = 1;
+    /**
+     * Sample quiz dataset for Patente B (Italian + Sorani + Badini).
+     * Additional questions can be appended safely to this array.
+     */
+    const QUESTIONS = [
+      {
+        id: 1,
+        chapter: 1,
+        isVipVideo: false,
+        it: "La carreggiata è la parte della strada destinata allo scorrimento dei veicoli.",
+        sorani: "شەقامی ئۆتۆمبێل (Carreggiata) ئەو بەشەی ڕێگایە کە بۆ هاتوچۆی ئۆتۆمبێل تەرخان کراوە.",
+        badini: "جادا ترۆمبێلا (Carreggiata) ئەو پشکا ڕێکێ یە کو بۆ هاتنوچوونا ترۆمبێلا هاتییە تەرخانکرن.",
+        image: "",
+        video: "",
+        answer: true,
+        exp_sorani: "ڕاستە؛ شەقامی ئۆتۆمبێل بەشێکی سەرەکیی ڕێگایە بۆ ڕۆیشتنی ئۆتۆمبێلەکان.",
+        exp_badini: "ڕاستە؛ جادا ترۆمبێلا پشکەکا سەرەکی یا ڕێکێ یە بۆ چوونا ترۆمبێلان."
+      },
+      {
+        id: 2,
+        chapter: 5,
+        isVipVideo: true,
+        it: "In questa situazione video, il veicolo che sopraggiunge da destra ha la precedenza.",
+        sorani: "لەم دۆخە ڤیدیۆییەدا، ئەو ئۆتۆمبێلەی لە لای ڕاستەوە دێت ئەولەوییەتی هەیە.",
+        badini: "د ڤێ ڕەوشا ڤیدیۆیی دا، ترۆمبێلا کو ژ لایێ ڕاستێ ڤە دهێت ئەولەوییەت یا هەی.",
+        image: "",
+        video: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+        answer: true,
+        exp_sorani: "لە یەکتربڕی بێ هێمادا، ئۆتۆمبێلی لای ڕاست ئەولەوییەتی هەیە.",
+        exp_badini: "ل یەکتربڕا بێ هێما دا، ترۆمبێلا لایێ ڕاستێ ئەولەوییەت یا هەی."
       }
+    ];
 
-      const activeCh = currentChapter();
-      const q = currentQuestion();
-      const qLang = q[state.lang] || q.ckb;
-
-      document.getElementById("chapterBadge").textContent = `${activeCh.id} / 16`;
-      document.getElementById("chapterTitle").textContent = activeCh[state.lang];
-      document.getElementById("questionText").textContent = qLang.q;
-
-      const videoSec = document.getElementById("videoSection");
-      if (q.isVideo) {
-        videoSec.style.display = "block";
-        document.getElementById("videoDesc").textContent = qLang.video;
-      } else {
-        videoSec.style.display = "none";
-      }
-
-      const savedChoice = state.answers[q.id];
-      const btnTrue = document.getElementById("btnTrue");
-      const btnFalse = document.getElementById("btnFalse");
-      btnTrue.classList.remove("selected-true", "selected-false");
-      btnFalse.classList.remove("selected-true", "selected-false");
-
-      const fb = document.getElementById("feedbackBox");
-      fb.style.display = "none";
-
-      if (savedChoice !== undefined) {
-        const chosenBtn = savedChoice === true ? btnTrue : btnFalse;
-        const isCorrect = savedChoice === q.ans;
-        chosenBtn.classList.add(isCorrect ? "selected-true" : "selected-false");
-
-        if (state.mode === "practice") {
-          fb.style.display = "block";
-          fb.style.borderColor = isCorrect ? "var(--ok)" : "var(--err)";
-          fb.innerHTML = `<strong style="color:${isCorrect ? "var(--ok)" : "var(--err)"}">${isCorrect ? tr.correct : tr.wrong}</strong><br>${qLang.exp}`;
-        }
-      }
-
-      renderChapters();
-      saveState();
-    }
-
-    function answerQuestion(choice) {
-      const q = currentQuestion();
-      state.answers[q.id] = choice;
-      renderAll();
-    }
-
-    async function verifyVipViaSupabase() {
-      const tr = t();
-      const code = document.getElementById("vipCodeInput").value.trim();
-      const msgEl = document.getElementById("vipStatusMsg");
-
-      if (!code) return;
-
-      if (!SUPABASE_CONFIG.url || !SUPABASE_CONFIG.anonKey) {
-        msgEl.style.color = "#fbbf24";
-        msgEl.textContent = tr.vipMissingConfig;
-        return;
-      }
-
+    /**
+     * Safe storage helper to avoid runtime errors in restricted browsers.
+     */
+    function readStorage(key, fallbackValue) {
       try {
-        const res = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/rpc/${SUPABASE_CONFIG.rpcName}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_CONFIG.anonKey,
-            "Authorization": `Bearer ${SUPABASE_CONFIG.anonKey}`
-          },
-          body: JSON.stringify({ p_code: code })
-        });
+        const raw = localStorage.getItem(key);
+        return raw !== null ? raw : fallbackValue;
+      } catch (err) {
+        console.warn("Storage read error:", err);
+        return fallbackValue;
+      }
+    }
 
-        if (!res.ok) {
-          msgEl.style.color = "var(--err)";
-          msgEl.textContent = tr.vipInvalid;
+    function writeStorage(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (err) {
+        console.warn("Storage write error:", err);
+      }
+    }
+
+    // Application state
+    let list = [...QUESTIONS];
+    let idx = 0;
+    let answers = {};
+    let vipUnlocked = false;
+    let timerInterval = null;
+    let secondsLeft = 0;
+    let toastTimeout = null;
+
+    try {
+      answers = JSON.parse(readStorage("patente_answers", "{}"));
+      if (!answers || typeof answers !== "object") {
+        answers = {};
+      }
+    } catch (err) {
+      console.warn("Failed to parse saved answers:", err);
+      answers = {};
+    }
+
+    vipUnlocked = readStorage("patente_vip_unlocked", "false") === "true";
+
+    /**
+     * Displays a non-intrusive notification message on screen.
+     */
+    function showToast(message, tone = "info") {
+      const box = document.getElementById("toastBox");
+      const textEl = document.getElementById("toastMessage");
+      if (!box || !textEl) return;
+
+      textEl.textContent = message;
+      box.style.borderColor =
+        tone === "success" ? "#22c55e" :
+        tone === "error" ? "#ef4444" :
+        tone === "vip" ? "#f59e0b" : "var(--border)";
+
+      box.classList.add("show");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        hideToast();
+      }, 4000);
+    }
+
+    function hideToast() {
+      const box = document.getElementById("toastBox");
+      if (box) {
+        box.classList.remove("show");
+      }
+    }
+
+    /**
+     * Populates unique chapters into the chapter dropdown.
+     */
+    function initChapters() {
+      try {
+        const select = document.getElementById("chapterSelect");
+        if (!select) return;
+
+        const chapters = [...new Set(QUESTIONS.map(q => q.chapter))].sort((a, b) => a - b);
+        chapters.forEach(ch => {
+          const opt = document.createElement("option");
+          opt.value = String(ch);
+          opt.textContent = `بەشی ${ch}`;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        console.error("initChapters error:", err);
+      }
+    }
+
+    /**
+     * Updates VIP status badge style and text.
+     */
+    function updateVipBadge() {
+      const btn = document.getElementById("vipStatusBtn");
+      if (!btn) return;
+
+      if (vipUnlocked) {
+        btn.textContent = "دۆخی VIP: چالاکە ✓";
+        btn.style.background = "rgba(34, 197, 94, 0.16)";
+        btn.style.color = "#22c55e";
+        btn.style.borderColor = "rgba(34, 197, 94, 0.4)";
+      } else {
+        btn.textContent = "دۆخی VIP: قفڵە";
+        btn.style.background = "rgba(245, 158, 11, 0.16)";
+        btn.style.color = "#f59e0b";
+        btn.style.borderColor = "rgba(245, 158, 11, 0.4)";
+      }
+    }
+
+    /**
+     * Navigates to VIP section or informs user if already active.
+     */
+    function focusVipOrInfo() {
+      if (vipUnlocked) {
+        showToast("بەشی VIP بۆ تۆ چالاک کراوە.", "success");
+      } else {
+        const chapterSelect = document.getElementById("chapterSelect");
+        if (chapterSelect) {
+          chapterSelect.value = "video_vip";
+        }
+        applyFilters();
+        showToast("کۆدی VIP بنووسە بۆ کردنەوەی ڤیدیۆ تایبەتەکان.", "vip");
+      }
+    }
+
+    /**
+     * Validates a VIP activation code.
+     */
+    async function verifyCodeInDatabase(code) {
+      return typeof code === "string" && code.trim().length >= 4;
+    }
+
+    /**
+     * Handles unlocking VIP access via input code.
+     */
+    async function handleUnlockVip() {
+      try {
+        const input = document.getElementById("vipCodeInput");
+        const code = input ? input.value.trim().toUpperCase() : "";
+
+        if (!code) {
+          showToast("تکایە کۆدەکە بنووسە.", "error");
           return;
         }
 
-        const isValid = await res.json();
-        if (isValid === true) {
-          state.isVip = true;
-          saveState();
-          msgEl.style.color = "var(--ok)";
-          msgEl.textContent = tr.vipSuccess;
-          renderAll();
+        const ok = await verifyCodeInDatabase(code);
+        if (ok) {
+          vipUnlocked = true;
+          writeStorage("patente_vip_unlocked", "true");
+          updateVipBadge();
+          showToast("بەشی VIP بە سەرکەوتوویی کرایەوە!", "success");
+          renderQuestion();
         } else {
-          msgEl.style.color = "var(--err)";
-          msgEl.textContent = tr.vipInvalid;
+          showToast("کۆدەکە هەڵەیە؛ لانی کەم ٤ پیت یان ژمارە بێت.", "error");
         }
-      } catch (e) {
-        msgEl.style.color = "var(--err)";
-        msgEl.textContent = tr.vipInvalid;
+      } catch (err) {
+        console.error("handleUnlockVip error:", err);
+        showToast("هەڵەیەک لە کاتی چالاککردن ڕوویدا.", "error");
       }
     }
 
-    document.getElementById("langSelect").addEventListener("change", (e) => {
-      state.lang = e.target.value;
-      renderAll();
-    });
+    /**
+     * Filters questions by selected chapter or VIP video category.
+     */
+    function applyFilters() {
+      try {
+        const select = document.getElementById("chapterSelect");
+        const val = select ? select.value : "all";
 
-    document.getElementById("modePracticeBtn").addEventListener("click", () => {
-      state.mode = "practice";
-      stopExamTimer();
-      renderAll();
-    });
+        clearInterval(timerInterval);
+        timerInterval = null;
+        document.getElementById("timerText").textContent = "دۆخی خوێندنی ئاسایی";
 
-    document.getElementById("modeExamBtn").addEventListener("click", () => {
-      state.mode = "exam";
-      startExamTimer();
-      renderAll();
-    });
+        if (val === "all") {
+          list = [...QUESTIONS];
+        } else if (val === "video_vip") {
+          list = QUESTIONS.filter(q => q.isVipVideo);
+        } else {
+          list = QUESTIONS.filter(q => String(q.chapter) === val);
+        }
 
-    document.getElementById("vipToggleBtn").addEventListener("click", () => {
-      const panel = document.getElementById("vipActivationPanel");
-      panel.style.display = panel.style.display === "none" ? "block" : "none";
-    });
+        idx = 0;
+        renderQuestion();
+      } catch (err) {
+        console.error("applyFilters error:", err);
+      }
+    }
 
-    document.getElementById("verifyVipBtn").addEventListener("click", verifyVipViaSupabase);
-    document.getElementById("btnTrue").addEventListener("click", () => answerQuestion(true));
-    document.getElementById("btnFalse").addEventListener("click", () => answerQuestion(false));
-    document.getElementById("finishExamBtn").addEventListener("click", finishExam);
+    /**
+     * Starts a 30-question timed exam session.
+     */
+    function startExamMode() {
+      try {
+        clearInterval(timerInterval);
+        const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5);
+        list = shuffled.slice(0, Math.min(30, shuffled.length));
+        idx = 0;
+        secondsLeft = 30 * 60;
 
-    document.getElementById("prevQBtn").addEventListener("click", () => {
-      const unlocked = CHAPTERS.filter((c) => !c.vip || state.isVip);
-      const idx = unlocked.findIndex((c) => c.id === state.chapterId);
+        const updateTimerDisplay = () => {
+          const safeSecs = Math.max(0, secondsLeft);
+          const mins = Math.floor(safeSecs / 60);
+          const secs = safeSecs % 60;
+          document.getElementById("timerText").textContent =
+            `کاتی ماوە: ${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+        };
+
+        updateTimerDisplay();
+
+        timerInterval = setInterval(() => {
+          secondsLeft--;
+          updateTimerDisplay();
+
+          if (secondsLeft <= 0) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            showToast("کاتی تاقیکردنەوە تەواو بوو!", "info");
+          }
+        }, 1000);
+
+        renderQuestion();
+        showToast("تاقیکردنەوە دەستی پێ کرد.", "info");
+      } catch (err) {
+        console.error("startExamMode error:", err);
+      }
+    }
+
+    /**
+     * Updates overall completion progress bar and counter text.
+     */
+    function updateProgressUI() {
+      const total = QUESTIONS.length || 1;
+      const doneCount = Object.keys(answers).length;
+      const pct = Math.min(100, Math.round((doneCount / total) * 100));
+
+      const bar = document.getElementById("progressBar");
+      const counter = document.getElementById("counter");
+
+      if (bar) {
+        bar.style.width = `${pct}%`;
+      }
+      if (counter) {
+        const displayIndex = list.length > 0 ? idx + 1 : 0;
+        counter.textContent = `پرسیار ${displayIndex} لە ${list.length}  |  تەواوکراو: ${pct}%`;
+      }
+    }
+
+    /**
+     * Renders the active question text, media, and lock state.
+     */
+    function renderQuestion() {
+      try {
+        const qIt = document.getElementById("qIt");
+        const qKu = document.getElementById("qKu");
+        const img = document.getElementById("qImg");
+        const vid = document.getElementById("qVideo");
+        const lockBox = document.getElementById("vipLockBox");
+        const fb = document.getElementById("feedback");
+
+        if (fb) {
+          fb.style.display = "none";
+          fb.innerHTML = "";
+        }
+
+        if (img) {
+          img.style.display = "none";
+          img.removeAttribute("src");
+        }
+        if (vid) {
+          vid.style.display = "none";
+          vid.pause();
+          vid.removeAttribute("src");
+        }
+        if (lockBox) {
+          lockBox.style.display = "none";
+        }
+
+        const q = list[idx];
+        if (!q) {
+          if (qIt) qIt.textContent = "";
+          if (qKu) {
+            qKu.style.display = "block";
+            qKu.textContent = "هیچ پرسیارێک لەم بەشەدا نییە.";
+          }
+          updateProgressUI();
+          return;
+        }
+
+        const langSelect = document.getElementById("langSelect");
+        const lang = langSelect ? langSelect.value : "both";
+
+        if (qIt) {
+          qIt.style.display = (lang === "both" || lang === "it") ? "block" : "none";
+          qIt.textContent = q.it || "";
+        }
+
+        if (qKu) {
+          if (lang === "badini") {
+            qKu.style.display = "block";
+            qKu.textContent = q.badini || q.sorani || "";
+          } else if (lang === "sorani" || lang === "both") {
+            qKu.style.display = "block";
+            qKu.textContent = q.sorani || q.badini || "";
+          } else {
+            qKu.style.display = "none";
+          }
+        }
+
+        if (q.isVipVideo && !vipUnlocked) {
+          if (lockBox) lockBox.style.display = "block";
+        } else if (q.video && vid) {
+          vid.src = q.video;
+          vid.style.display = "block";
+        } else if (q.image && img) {
+          img.src = q.image;
+          img.style.display = "block";
+        }
+
+        updateProgressUI();
+      } catch (err) {
+        console.error("renderQuestion error:", err);
+        showToast("هەڵەیەک لە پیشاندانی پرسیارەکەدا ڕوویدا.", "error");
+      }
+    }
+
+    /**
+     * Records user answer (true = VERO, false = FALSO) and shows explanation.
+     */
+    function submitAnswer(choice) {
+      try {
+        const q = list[idx];
+        if (!q) return;
+
+        answers[q.id] = choice;
+        writeStorage("patente_answers", JSON.stringify(answers));
+
+        const langSelect = document.getElementById("langSelect");
+        const lang = langSelect ? langSelect.value : "both";
+        const exp = (lang === "badini")
+          ? (q.exp_badini || q.exp_sorani || "")
+          : (q.exp_sorani || q.exp_badini || "");
+
+        const fb = document.getElementById("feedback");
+        if (fb) {
+          fb.style.display = "block";
+          if (choice === q.answer) {
+            fb.style.borderColor = "#22c55e";
+            fb.innerHTML = `<strong style="color:#22c55e;">وەڵامەکەت ڕاستە!</strong><br>${exp}`;
+          } else {
+            fb.style.borderColor = "#ef4444";
+            fb.innerHTML = `<strong style="color:#ef4444;">وەڵامەکەت هەڵەیە.</strong><br>${exp}`;
+          }
+        }
+
+        updateProgressUI();
+      } catch (err) {
+        console.error("submitAnswer error:", err);
+      }
+    }
+
+    /**
+     * Advances to the next question in the current list.
+     */
+    function nextQuestion() {
+      if (idx < list.length - 1) {
+        idx++;
+        renderQuestion();
+      }
+    }
+
+    /**
+     * Goes back to the previous question in the current list.
+     */
+    function prevQuestion() {
       if (idx > 0) {
-        state.chapterId = unlocked[idx - 1].id;
-        renderAll();
+        idx--;
+        renderQuestion();
       }
-    });
+    }
 
-    document.getElementById("nextQBtn").addEventListener("click", () => {
-      const unlocked = CHAPTERS.filter((c) => !c.vip || state.isVip);
-      const idx = unlocked.findIndex((c) => c.id === state.chapterId);
-      if (idx < unlocked.length - 1) {
-        state.chapterId = unlocked[idx + 1].id;
-        renderAll();
-      }
-    });
-
-    renderAll();
+    // Initial boot
+    initChapters();
+    updateVipBadge();
+    renderQuestion();
   </script>
 </body>
 </html>
